@@ -1,0 +1,16 @@
+{
+  "name": "Sleep Bank",
+  "dockerComposeFile": "compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/workspace/sleep-bank",
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["redhat.vscode-yaml", "Vue.volar"]
+    }
+  },
+
+  "postStartCommand": ".devcontainer/post-start.sh"
+}
