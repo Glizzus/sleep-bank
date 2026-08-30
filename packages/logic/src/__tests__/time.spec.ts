@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatDuration, formatTimeOfDay } from '../time'
+import { formatDuration, formatTimeOfDay, segmentMinutes } from '../time'
 
 describe('formatDuration', () => {
   it.each([
@@ -13,6 +13,18 @@ describe('formatDuration', () => {
     [750, '12h 30m'],
   ])('formats %i minutes as "%s"', (minutes, expected) => {
     expect(formatDuration(minutes)).toBe(expected)
+  })
+})
+
+describe('segmentMinutes', () => {
+  it.each([
+    [1380, 390, 450], // 11:00 PM -> 6:30 AM crosses midnight
+    [0, 480, 480],
+    [840, 900, 60], // afternoon nap
+    [390, 390, 0],
+    [15, 0, 1425],
+  ])('(%i, %i) -> %i', (start, end, expected) => {
+    expect(segmentMinutes(start, end)).toBe(expected)
   })
 })
 

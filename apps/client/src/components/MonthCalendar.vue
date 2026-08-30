@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { buildCalendarCells, shiftMonth } from '@sleep-bank/logic'
-import { isToday, today as startOfToday } from '@/lib/clock'
+import { isToday } from '@/lib/clock'
+import CalendarCell from '@/components/CalendarCell.vue'
+
+defineProps<{
+  /** paint for a day's cell, e.g. a debt mark; undefined leaves it unpainted */
+  paint?: (date: Date) => string | undefined
+}>()
+
+defineEmits<{ selectDay: [date: Date] }>()
 
 const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
-const today = startOfToday()
-const year = ref(today.getFullYear())
-const month = ref(today.getMonth())
+/** the visible month, owned by the parent view */
+const year = defineModel<number>('year', { required: true })
+const month = defineModel<number>('month', { required: true })
 
 const cells = computed(() => buildCalendarCells(year.value, month.value))
 const monthLabel = computed(() =>
@@ -33,18 +41,19 @@ function shift(delta: number) {
     </header>
     <div class="calendar">
       <span v-for="(day, i) in WEEKDAYS" :key="i" class="weekday">{{ day }}</span>
-      <div
-        v-for="(cell, i) in cells"
-        :key="i"
-        class="cell"
-        :class="{ 'cell--today': cell.date !== null && isToday(cell.date) }"
-      >
-        <template v-if="cell.date && cell.dayOfMonth">
+      <template v-for="(cell, i) in cells" :key="i">
+        <CalendarCell
+          v-if="cell.date && cell.dayOfMonth"
+          :today="isToday(cell.date)"
+          :paint="paint?.(cell.date)"
+          @click="$emit('selectDay', cell.date)"
+        >
           <slot name="day" :date="cell.date" :day-of-month="cell.dayOfMonth">
             {{ cell.dayOfMonth }}
           </slot>
-        </template>
-      </div>
+        </CalendarCell>
+        <div v-else class="blank" />
+      </template>
     </div>
   </div>
 </template>
@@ -82,15 +91,7 @@ function shift(delta: number) {
   opacity: 0.55;
 }
 
-.cell {
+.blank {
   aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  font-variant-numeric: tabular-nums;
-}
-
-.cell--today {
-  background: var(--color-recessed);
 }
 </style>
