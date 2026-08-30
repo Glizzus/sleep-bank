@@ -1,16 +1,13 @@
-import { and, asc, eq, gte, lt } from 'drizzle-orm'
-import { wakeUpDateKey, type SleepLogNight, type SleepSegment } from '@sleep-bank/logic'
+import { and, asc, eq, gte, lte } from 'drizzle-orm'
+import { debtWindow, wakeUpDateKey, type SleepLogNight, type SleepSegment } from '@sleep-bank/logic'
 import { db } from '@/db'
 import { sleepLog, sleepLogEntry } from '@/db/schema'
 import { currentUserId } from '@/lib/id'
 
 export type { SleepLogNight, SleepSegment }
 
-/** all logged nights of a month (0-indexed), with their segments */
-export async function getSleepLogsForMonth(year: number, month: number): Promise<SleepLogNight[]> {
-  const start = wakeUpDateKey(new Date(year, month, 1))
-  const end = wakeUpDateKey(new Date(year, month + 1, 1))
-
+/** logged nights waking in [start, end] (inclusive keys), with their segments */
+async function getSleepLogsBetween(start: string, end: string): Promise<SleepLogNight[]> {
   const rows = await db
     .select({
       wakeUpDate: sleepLog.wakeUpDate,
@@ -23,7 +20,7 @@ export async function getSleepLogsForMonth(year: number, month: number): Promise
       and(
         eq(sleepLog.userId, currentUserId()),
         gte(sleepLog.wakeUpDate, start),
-        lt(sleepLog.wakeUpDate, end),
+        lte(sleepLog.wakeUpDate, end),
       ),
     )
     .orderBy(asc(sleepLog.wakeUpDate), asc(sleepLogEntry.startMinuteOfDay))
@@ -44,6 +41,19 @@ export async function getSleepLogsForMonth(year: number, month: number): Promise
     }
   }
   return [...byDate.values()]
+}
+
+/** all logged nights of a month (0-indexed), with their segments */
+export async function getSleepLogsForMonth(year: number, month: number): Promise<SleepLogNight[]> {
+  const start = wakeUpDateKey(new Date(year, month, 1))
+  const end = wakeUpDateKey(new Date(year, month + 1, 0))
+  return getSleepLogsBetween(start, end)
+}
+
+/** the logged nights of the 14-night debt window ending at `endWakeUpDate` */
+export async function getSleepLogsForDebtWindow(endWakeUpDate: string): Promise<SleepLogNight[]> {
+  const window = debtWindow(endWakeUpDate)
+  return getSleepLogsBetween(window[0]!, endWakeUpDate)
 }
 
 /** upserts the night and replaces its entries with the single given segment */
