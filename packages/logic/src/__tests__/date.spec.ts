@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest'
-import { formatNightDate, nightDateKey } from '../date'
+import { formatNightDate, wakeUpDateKey } from '../date'
 
-describe('nightDateKey', () => {
+describe('wakeUpDateKey', () => {
   it.each([
     [new Date(2026, 7, 30), '2026-08-30'],
     [new Date(2026, 0, 1), '2026-01-01'],
     [new Date(2026, 11, 9), '2026-12-09'],
     [new Date(2026, 7, 30, 23, 59), '2026-08-30'],
   ])('%o -> "%s"', (date, expected) => {
-    expect(nightDateKey(date)).toBe(expected)
+    expect(wakeUpDateKey(date)).toBe(expected)
   })
 })
 

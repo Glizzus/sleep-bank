@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useFifteenMinuteStepper } from '@/composables/useFifteenMinuteStepper'
+import { usePressAndHold } from '@/composables/usePressAndHold'
 
 const props = withDefaults(defineProps<{ min?: number; max?: number; wrap?: boolean }>(), {
   min: 0,
@@ -15,13 +16,16 @@ const { step, canStepDown, canStepUp } = useFifteenMinuteStepper(value, {
   max: () => props.max,
   wrap: () => props.wrap,
 })
+
+const holdDown = usePressAndHold(() => step(-1))
+const holdUp = usePressAndHold(() => step(1))
 </script>
 
 <template>
   <div class="stepper">
-    <button aria-label="15 minutes less" :disabled="!canStepDown" @click="step(-1)">−</button>
+    <button aria-label="15 minutes less" :disabled="!canStepDown" v-on="holdDown">−</button>
     <span class="value"><slot :value="value">{{ value }}</slot></span>
-    <button aria-label="15 minutes more" :disabled="!canStepUp" @click="step(1)">+</button>
+    <button aria-label="15 minutes more" :disabled="!canStepUp" v-on="holdUp">+</button>
   </div>
 </template>
 
@@ -42,6 +46,11 @@ button {
   color: var(--color-ink);
   font-family: inherit;
   font-size: var(--text-xl);
+
+  /* press-and-hold: no double-tap zoom, no long-press selection or callout */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 button:disabled {

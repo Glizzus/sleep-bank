@@ -1,12 +1,12 @@
 CREATE TABLE `sleep_log` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
-	`night_date` text NOT NULL,
+	`wake_up_date` text NOT NULL,
 	`created_at` integer NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `sleep_log_user_id_night_date_unique` ON `sleep_log` (`user_id`,`night_date`);--> statement-breakpoint
+CREATE UNIQUE INDEX `sleep_log_user_id_wake_up_date_unique` ON `sleep_log` (`user_id`,`wake_up_date`);--> statement-breakpoint
 CREATE TABLE `sleep_log_entry` (
 	`id` text PRIMARY KEY NOT NULL,
 	`sleep_log_id` text NOT NULL,

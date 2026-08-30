@@ -1,29 +1,19 @@
 import { and, asc, eq, gte, lt } from 'drizzle-orm'
-import { nightDateKey } from '@sleep-bank/logic'
+import { wakeUpDateKey, type SleepLogNight, type SleepSegment } from '@sleep-bank/logic'
 import { db } from '@/db'
 import { sleepLog, sleepLogEntry } from '@/db/schema'
 import { currentUserId } from '@/lib/id'
 
-export interface SleepSegment {
-  startMinuteOfDay: number
-  endMinuteOfDay: number
-}
-
-export interface SleepLogNight {
-  /** local YYYY-MM-DD of the wake-up date */
-  nightDate: string
-  /** empty means logged but slept nothing */
-  entries: SleepSegment[]
-}
+export type { SleepLogNight, SleepSegment }
 
 /** all logged nights of a month (0-indexed), with their segments */
 export async function getSleepLogsForMonth(year: number, month: number): Promise<SleepLogNight[]> {
-  const start = nightDateKey(new Date(year, month, 1))
-  const end = nightDateKey(new Date(year, month + 1, 1))
+  const start = wakeUpDateKey(new Date(year, month, 1))
+  const end = wakeUpDateKey(new Date(year, month + 1, 1))
 
   const rows = await db
     .select({
-      nightDate: sleepLog.nightDate,
+      wakeUpDate: sleepLog.wakeUpDate,
       startMinuteOfDay: sleepLogEntry.startMinuteOfDay,
       endMinuteOfDay: sleepLogEntry.endMinuteOfDay,
     })
@@ -32,18 +22,18 @@ export async function getSleepLogsForMonth(year: number, month: number): Promise
     .where(
       and(
         eq(sleepLog.userId, currentUserId()),
-        gte(sleepLog.nightDate, start),
-        lt(sleepLog.nightDate, end),
+        gte(sleepLog.wakeUpDate, start),
+        lt(sleepLog.wakeUpDate, end),
       ),
     )
-    .orderBy(asc(sleepLog.nightDate), asc(sleepLogEntry.startMinuteOfDay))
+    .orderBy(asc(sleepLog.wakeUpDate), asc(sleepLogEntry.startMinuteOfDay))
 
   const byDate = new Map<string, SleepLogNight>()
   for (const row of rows) {
-    let night = byDate.get(row.nightDate)
+    let night = byDate.get(row.wakeUpDate)
     if (!night) {
-      night = { nightDate: row.nightDate, entries: [] }
-      byDate.set(row.nightDate, night)
+      night = { wakeUpDate: row.wakeUpDate, entries: [] }
+      byDate.set(row.wakeUpDate, night)
     }
     /* left join: both null when the night has no entries */
     if (row.startMinuteOfDay !== null && row.endMinuteOfDay !== null) {
@@ -57,16 +47,16 @@ export async function getSleepLogsForMonth(year: number, month: number): Promise
 }
 
 /** upserts the night and replaces its entries with the single given segment */
-export async function saveSleepLog(nightDate: string, segment: SleepSegment): Promise<void> {
+export async function saveSleepLog(wakeUpDate: string, segment: SleepSegment): Promise<void> {
   const existing = await db
     .select({ id: sleepLog.id })
     .from(sleepLog)
-    .where(and(eq(sleepLog.userId, currentUserId()), eq(sleepLog.nightDate, nightDate)))
+    .where(and(eq(sleepLog.userId, currentUserId()), eq(sleepLog.wakeUpDate, wakeUpDate)))
 
   let logId = existing[0]?.id
   if (logId === undefined) {
     logId = crypto.randomUUID()
-    await db.insert(sleepLog).values({ id: logId, userId: currentUserId(), nightDate })
+    await db.insert(sleepLog).values({ id: logId, userId: currentUserId(), wakeUpDate })
   }
 
   await db.delete(sleepLogEntry).where(eq(sleepLogEntry.sleepLogId, logId))

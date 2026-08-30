@@ -18,15 +18,15 @@ export function useSleepLogs(year: MaybeRefOrGetter<number>, month: MaybeRefOrGe
      watchEffect tracks them */
   watchEffect(() => void refresh())
 
-  /** lookup by nightDateKey, for calendar paint and sheet prefill */
+  /** lookup by wakeUpDateKey, for calendar paint and sheet prefill */
   const nightsByDate = computed(
-    () => new Map(nights.value?.map((night) => [night.nightDate, night])),
+    () => new Map(nights.value?.map((night) => [night.wakeUpDate, night])),
   )
 
   /* writes repull instead of patching local state: the db is local, so a
      re-read is ~instant and stays the single source of truth */
-  async function saveNight(nightDate: string, segment: SleepSegment) {
-    await saveSleepLog(nightDate, segment)
+  async function saveNight(wakeUpDate: string, segment: SleepSegment) {
+    await saveSleepLog(wakeUpDate, segment)
     await refresh()
   }
 

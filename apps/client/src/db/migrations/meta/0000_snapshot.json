@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "45b72104-d9d6-4380-b749-c316200dbb7a",
+  "id": "17643108-a188-415f-bc27-36fd194bd343",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "sleep_log": {
@@ -21,8 +21,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "night_date": {
-          "name": "night_date",
+        "wake_up_date": {
+          "name": "wake_up_date",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -37,11 +37,11 @@
         }
       },
       "indexes": {
-        "sleep_log_user_id_night_date_unique": {
-          "name": "sleep_log_user_id_night_date_unique",
+        "sleep_log_user_id_wake_up_date_unique": {
+          "name": "sleep_log_user_id_wake_up_date_unique",
           "columns": [
             "user_id",
-            "night_date"
+            "wake_up_date"
           ],
           "isUnique": true
         }

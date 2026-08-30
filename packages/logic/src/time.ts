@@ -5,6 +5,14 @@ export function formatDuration(minutes: number): string {
   return `${h}h ${String(m).padStart(2, '0')}m`
 }
 
+/** tight duration for small spaces: 480 -> "8h", 465 -> "7h45", 45 -> "45m" */
+export function formatDurationCompact(minutes: number): string {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h === 0) return `${m}m`
+  return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, '0')}`
+}
+
 /** duration of a sleep segment in minutes; start > end wraps past midnight */
 export function segmentMinutes(startMinuteOfDay: number, endMinuteOfDay: number): number {
   return (endMinuteOfDay - startMinuteOfDay + 1440) % 1440

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { nightDateKey, segmentMinutes } from '@sleep-bank/logic'
+import {
+  formatDurationCompact,
+  wakeUpDateKey,
+  nightShortfall,
+  nightSleptMinutes,
+} from '@sleep-bank/logic'
 import MonthCalendar from '@/components/MonthCalendar.vue'
 import SleepLogSheet from '@/components/SleepLogSheet.vue'
 import { useSleepLogs } from '@/composables/useSleepLogs'
@@ -16,15 +21,20 @@ const month = ref(current.getMonth())
 const { nightsByDate, saveNight } = useSleepLogs(year, month)
 const { preferences } = usePreferences()
 
-function paintNight(date: Date): string | undefined {
-  const night = nightsByDate.value.get(nightDateKey(date))
+function shortfallOf(date: Date): number | undefined {
+  const night = nightsByDate.value.get(wakeUpDateKey(date))
   if (!night || !preferences.value) return undefined
-  const slept = night.entries.reduce(
-    (sum, entry) => sum + segmentMinutes(entry.startMinuteOfDay, entry.endMinuteOfDay),
-    0,
-  )
-  const shortfall = Math.max(0, preferences.value.baselineSleepMinutes - slept)
-  return debtClayColor(shortfall)
+  return nightShortfall(night, preferences.value.baselineSleepMinutes)
+}
+
+function paintNight(date: Date): string | undefined {
+  const shortfall = shortfallOf(date)
+  return shortfall === undefined ? undefined : debtClayColor(shortfall)
+}
+
+function sleptLabel(date: Date): string | undefined {
+  const night = nightsByDate.value.get(wakeUpDateKey(date))
+  return night ? formatDurationCompact(nightSleptMinutes(night)) : undefined
 }
 
 const sheetOpen = ref(false)
@@ -32,7 +42,7 @@ const selectedDate = ref<Date>()
 
 const initialSegment = computed(() =>
   selectedDate.value
-    ? nightsByDate.value.get(nightDateKey(selectedDate.value))?.entries[0]
+    ? nightsByDate.value.get(wakeUpDateKey(selectedDate.value))?.entries[0]
     : undefined,
 )
 
@@ -43,7 +53,7 @@ function openNight(date: Date) {
 
 function onSave(segment: SleepSegment) {
   if (selectedDate.value === undefined) return
-  void saveNight(nightDateKey(selectedDate.value), segment)
+  void saveNight(wakeUpDateKey(selectedDate.value), segment)
 }
 </script>
 
@@ -53,6 +63,7 @@ function onSave(segment: SleepSegment) {
     v-model:year="year"
     v-model:month="month"
     :paint="paintNight"
+    :sublabel="sleptLabel"
     @select-day="openNight"
   />
   <SleepLogSheet

@@ -1,14 +1,18 @@
 <script setup lang="ts">
 defineProps<{
+  dayOfMonth: number
   today?: boolean
   /** background color, e.g. a debt mark */
   paint?: string
+  /** small line under the day number, e.g. a shortfall */
+  sublabel?: string
 }>()
 </script>
 
 <template>
   <button type="button" class="cell" :class="{ 'cell--today': today }" :style="{ background: paint }">
-    <slot />
+    <span class="day">{{ dayOfMonth }}</span>
+    <span v-if="sublabel" class="sublabel">{{ sublabel }}</span>
   </button>
 </template>
 
@@ -21,16 +25,32 @@ defineProps<{
   font: inherit;
   padding: 0;
 
-  aspect-ratio: 1;
+  aspect-ratio: 1 / 1.2;
   border-radius: var(--radius);
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0.3rem;
   font-variant-numeric: tabular-nums;
 
   /* touch feel: no double-tap-zoom delay, no tap flash, no long-press selection */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+}
+
+.day {
+  font-size: var(--text-xs);
+  line-height: 1;
+  opacity: 0.55;
+}
+
+/* centered in the space the header leaves */
+.sublabel {
+  margin-block: auto;
+  font-size: var(--text-xs);
+  line-height: 1;
+  opacity: 0.7;
 }
 
 /* :hover doesn't exist on touch; :active is the press feedback */

@@ -17,13 +17,13 @@ export const sleepLog = sqliteTable(
     userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    /** local YYYY-MM-DD of the wake-up date */
-    nightDate: text('night_date').notNull(),
+    /** local YYYY-MM-DD of the morning the night ended */
+    wakeUpDate: text('wake_up_date').notNull(),
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .$defaultFn(() => new Date())
       .notNull(),
   },
-  (table) => [unique().on(table.userId, table.nightDate)],
+  (table) => [unique().on(table.userId, table.wakeUpDate)],
 )
 
 /* one sleep segment (main block or nap) of a logged night */

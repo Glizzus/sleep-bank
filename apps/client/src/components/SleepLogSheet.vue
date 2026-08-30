@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { formatNightDate } from '@sleep-bank/logic'
+import { computed, ref, watch } from 'vue'
+import { formatDuration, formatNightDate, segmentMinutes } from '@sleep-bank/logic'
 import {
   Sheet,
   SheetClose,
@@ -33,6 +33,8 @@ watch(open, (isOpen) => {
   }
 })
 
+const slept = computed(() => formatDuration(segmentMinutes(asleep.value, awake.value)))
+
 function save() {
   emit('save', { startMinuteOfDay: asleep.value, endMinuteOfDay: awake.value })
   open.value = false
@@ -49,6 +51,7 @@ function save() {
         <FifteenMinuteTimeOfDayStepper v-model="asleep" label="Asleep" />
         <FifteenMinuteTimeOfDayStepper v-model="awake" label="Awake" />
       </div>
+      <p class="slept">{{ slept }}</p>
       <SheetFooter class="flex-row">
         <SheetClose as-child>
           <Button variant="outline" class="flex-1">Cancel</Button>
@@ -67,5 +70,13 @@ function save() {
 
 .rows > * + * {
   border-top: 1px solid var(--color-recessed);
+}
+
+.slept {
+  margin: 0;
+  padding-bottom: 1rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.55;
 }
 </style>
