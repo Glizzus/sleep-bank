@@ -14,7 +14,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         // default pattern skips fonts, which would break them offline
-        globPatterns: ['**/*.{js,css,html,woff2}'],
+        globPatterns: ['**/*.{js,css,html,woff2,wasm}'],
       },
       includeAssets: ['favicon.ico'],
       manifest: {
@@ -49,5 +49,22 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+  },
+  /* sqlite-wasm: COOP/COEP make the page cross-origin isolated, which OPFS
+     persistence requires; production hosting must send the same headers */
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
+  preview: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
+  optimizeDeps: {
+    exclude: ['@sqlite.org/sqlite-wasm', 'sqlocal'],
   },
 })

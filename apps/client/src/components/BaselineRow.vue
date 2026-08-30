@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { formatDuration } from '@sleep-bank/logic'
 import FifteenMinuteStepper from '@/components/FifteenMinuteStepper.vue'
 import SettingRow from '@/components/SettingRow.vue'
 
 /** baseline sleep need, in minutes */
-const value = ref(480)
+const value = defineModel<number>({ required: true })
 </script>
 
 <template>

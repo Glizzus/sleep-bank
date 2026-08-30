@@ -9,8 +9,8 @@ vi.mock('@sleep-bank/logic', () => ({
   formatDuration: vi.fn((minutes: number) => `dur(${minutes})`),
 }))
 
-function mountRow() {
-  return mount(BaselineRow)
+function mountRow(modelValue = 480) {
+  return mount(BaselineRow, { props: { modelValue } })
 }
 
 describe('BaselineRow', () => {
@@ -25,16 +25,15 @@ describe('BaselineRow', () => {
     expect(stepper.props('wrap')).toBe(false)
   })
 
-  it('owns its value, defaulting to 8h and stepping in place', async () => {
-    const wrapper = mountRow()
-    const stepper = wrapper.getComponent(FifteenMinuteStepper)
-    expect(stepper.props('modelValue')).toBe(480)
+  it('passes the model to the stepper and re-emits updates', async () => {
+    const wrapper = mountRow(480)
+    expect(wrapper.getComponent(FifteenMinuteStepper).props('modelValue')).toBe(480)
     await wrapper.get('[aria-label="15 minutes more"]').trigger('click')
-    expect(stepper.props('modelValue')).toBe(495)
+    expect(wrapper.emitted('update:modelValue')).toEqual([[495]])
   })
 
   it('formats the value with formatDuration', () => {
-    const wrapper = mountRow()
+    const wrapper = mountRow(480)
     expect(vi.mocked(formatDuration)).toHaveBeenCalledWith(480)
     expect(wrapper.text()).toContain('dur(480)')
   })

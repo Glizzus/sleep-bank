@@ -9,8 +9,8 @@ vi.mock('@sleep-bank/logic', () => ({
   formatTimeOfDay: vi.fn((minutes: number) => `time(${minutes})`),
 }))
 
-function mountRow() {
-  return mount(WakeTimeRow)
+function mountRow(modelValue = 390) {
+  return mount(WakeTimeRow, { props: { modelValue } })
 }
 
 describe('WakeTimeRow', () => {
@@ -25,27 +25,21 @@ describe('WakeTimeRow', () => {
     expect(stepper.props('wrap')).toBe(true)
   })
 
-  it('owns its value, defaulting to 6:30 AM and stepping in place', async () => {
-    const wrapper = mountRow()
-    const stepper = wrapper.getComponent(FifteenMinuteStepper)
-    expect(stepper.props('modelValue')).toBe(390)
+  it('passes the model to the stepper and re-emits updates', async () => {
+    const wrapper = mountRow(390)
+    expect(wrapper.getComponent(FifteenMinuteStepper).props('modelValue')).toBe(390)
     await wrapper.get('[aria-label="15 minutes more"]').trigger('click')
-    expect(stepper.props('modelValue')).toBe(405)
+    expect(wrapper.emitted('update:modelValue')).toEqual([[405]])
   })
 
   it('wraps across midnight instead of clamping', async () => {
-    const wrapper = mountRow()
-    const minus = wrapper.get('[aria-label="15 minutes less"]')
-    /* 6:30 AM is 26 steps above midnight */
-    for (let i = 0; i < 26; i++) await minus.trigger('click')
-    const stepper = wrapper.getComponent(FifteenMinuteStepper)
-    expect(stepper.props('modelValue')).toBe(0)
-    await minus.trigger('click')
-    expect(stepper.props('modelValue')).toBe(1425)
+    const wrapper = mountRow(0)
+    await wrapper.get('[aria-label="15 minutes less"]').trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toEqual([[1425]])
   })
 
   it('formats the value with formatTimeOfDay', () => {
-    const wrapper = mountRow()
+    const wrapper = mountRow(390)
     expect(vi.mocked(formatTimeOfDay)).toHaveBeenCalledWith(390)
     expect(wrapper.text()).toContain('time(390)')
   })
