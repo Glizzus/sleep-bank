@@ -1,0 +1,15 @@
+{
+  "name": "@sleep-bank/logic",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test:unit": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.11"
+  }
+}

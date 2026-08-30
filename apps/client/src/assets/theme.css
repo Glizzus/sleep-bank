@@ -1,0 +1,35 @@
+:root {
+  color-scheme: light;
+
+  --color-surface: #f7f4ef;
+  --color-recessed: #ece7de;
+  --color-ink: #191b1d;
+
+  /* swap the import in main.ts along with this token */
+  /* --font-body: 'Newsreader Variable', serif; */
+  --font-body: 'Literata Variable', serif;
+
+  /* type scale, 1rem = 16px */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+h1 {
+  margin: 0;
+}
