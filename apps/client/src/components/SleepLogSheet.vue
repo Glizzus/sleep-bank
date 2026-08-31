@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { formatDuration, formatNightDate, segmentMinutes } from '@sleep-bank/logic'
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import FifteenMinuteTimeOfDayStepper from '@/components/FifteenMinuteTimeOfDayStepper.vue'
 import type { SleepSegment } from '@/queries/sleepLogs'
@@ -21,7 +14,7 @@ const props = defineProps<{
 
 const open = defineModel<boolean>('open', { required: true })
 
-const emit = defineEmits<{ save: [segment: SleepSegment] }>()
+const emit = defineEmits<{ save: [segment: SleepSegment]; clear: [] }>()
 
 const asleep = ref(1380)
 const awake = ref(390)
@@ -39,6 +32,11 @@ function save() {
   emit('save', { startMinuteOfDay: asleep.value, endMinuteOfDay: awake.value })
   open.value = false
 }
+
+function clear() {
+  emit('clear')
+  open.value = false
+}
 </script>
 
 <template>
@@ -53,10 +51,8 @@ function save() {
       </div>
       <p class="slept">{{ slept }}</p>
       <SheetFooter class="flex-row">
-        <SheetClose as-child>
-          <Button variant="outline" class="flex-1">Cancel</Button>
-        </SheetClose>
-        <Button class="flex-1" @click="save">Save</Button>
+        <Button variant="outline" class="h-12 flex-1" @click="clear">Clear</Button>
+        <Button class="h-12 flex-[3]" @click="save">Save</Button>
       </SheetFooter>
     </SheetContent>
   </Sheet>

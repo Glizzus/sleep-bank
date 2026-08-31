@@ -19,7 +19,6 @@ const sheetStubs = {
   SheetHeader: true,
   SheetTitle: true,
   SheetFooter: true,
-  SheetClose: true,
 }
 
 function mountSheet(props: Record<string, unknown> = {}) {
@@ -78,6 +77,14 @@ describe('SleepLogSheet', () => {
     steppers(wrapper)[1]!.vm.$emit('update:modelValue', 420)
     await wrapper.findAll('button').find((b) => b.text() === 'Save')!.trigger('click')
     expect(wrapper.emitted('save')).toEqual([[{ startMinuteOfDay: 1350, endMinuteOfDay: 420 }]])
+    expect(wrapper.emitted('update:open')).toEqual([[false]])
+  })
+
+  it('clears the night and closes, saving nothing', async () => {
+    const wrapper = mountSheet()
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear')!.trigger('click')
+    expect(wrapper.emitted('clear')).toEqual([[]])
+    expect(wrapper.emitted('save')).toBeUndefined()
     expect(wrapper.emitted('update:open')).toEqual([[false]])
   })
 })

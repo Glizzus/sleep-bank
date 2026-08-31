@@ -18,7 +18,7 @@ const current = today()
 const year = ref(current.getFullYear())
 const month = ref(current.getMonth())
 
-const { nightsByDate, saveNight } = useSleepLogs(year, month)
+const { nightsByDate, saveNight, deleteNight } = useSleepLogs(year, month)
 const { preferences } = usePreferences()
 
 function shortfallOf(date: Date): number | undefined {
@@ -55,6 +55,11 @@ function onSave(segment: SleepSegment) {
   if (selectedDate.value === undefined) return
   void saveNight(wakeUpDateKey(selectedDate.value), segment)
 }
+
+function onClear() {
+  if (selectedDate.value === undefined) return
+  void deleteNight(wakeUpDateKey(selectedDate.value))
+}
 </script>
 
 <template>
@@ -71,5 +76,6 @@ function onSave(segment: SleepSegment) {
     :date="selectedDate"
     :initial="initialSegment"
     @save="onSave"
+    @clear="onClear"
   />
 </template>

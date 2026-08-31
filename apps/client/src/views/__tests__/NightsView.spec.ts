@@ -26,6 +26,7 @@ vi.mock('@sleep-bank/logic', async (importOriginal) => ({
 }))
 
 const saveNight = vi.fn(async () => {})
+const deleteNight = vi.fn(async () => {})
 
 const loggedNight: SleepLogNight = {
   wakeUpDate: '2026-08-12',
@@ -37,6 +38,7 @@ function stub(nights: SleepLogNight[], preferences?: Preferences) {
     nights: ref(nights),
     nightsByDate: computed(() => new Map(nights.map((night) => [night.wakeUpDate, night]))),
     saveNight,
+    deleteNight,
   })
   vi.mocked(usePreferences).mockReturnValue({
     preferences: ref(preferences),
@@ -114,5 +116,12 @@ describe('NightsView', () => {
     const segment = { startMinuteOfDay: 1350, endMinuteOfDay: 420 }
     wrapper.getComponent(SleepLogSheet).vm.$emit('save', segment)
     expect(saveNight).toHaveBeenCalledWith('2026-08-13', segment)
+  })
+
+  it('clears through deleteNight keyed by the selected date', async () => {
+    const wrapper = shallowMount(NightsView)
+    await selectDay(wrapper, new Date(2026, 7, 12))
+    wrapper.getComponent(SleepLogSheet).vm.$emit('clear')
+    expect(deleteNight).toHaveBeenCalledWith('2026-08-12')
   })
 })

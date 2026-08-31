@@ -1,5 +1,6 @@
 import { computed, ref, watchEffect, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
 import {
+  deleteSleepLog,
   getSleepLogsForMonth,
   saveSleepLog,
   type SleepLogNight,
@@ -30,5 +31,10 @@ export function useSleepLogs(year: MaybeRefOrGetter<number>, month: MaybeRefOrGe
     await refresh()
   }
 
-  return { nights, nightsByDate, saveNight }
+  async function deleteNight(wakeUpDate: string) {
+    await deleteSleepLog(wakeUpDate)
+    await refresh()
+  }
+
+  return { nights, nightsByDate, saveNight, deleteNight }
 }

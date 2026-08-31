@@ -56,6 +56,20 @@ export async function getSleepLogsForDebtWindow(endWakeUpDate: string): Promise<
   return getSleepLogsBetween(window[0]!, endWakeUpDate)
 }
 
+/** removes the night's log and entries; a no-op when the night is unlogged */
+export async function deleteSleepLog(wakeUpDate: string): Promise<void> {
+  const existing = await db
+    .select({ id: sleepLog.id })
+    .from(sleepLog)
+    .where(and(eq(sleepLog.userId, currentUserId()), eq(sleepLog.wakeUpDate, wakeUpDate)))
+
+  const logId = existing[0]?.id
+  if (logId === undefined) return
+
+  await db.delete(sleepLogEntry).where(eq(sleepLogEntry.sleepLogId, logId))
+  await db.delete(sleepLog).where(eq(sleepLog.id, logId))
+}
+
 /** upserts the night and replaces its entries with the single given segment */
 export async function saveSleepLog(wakeUpDate: string, segment: SleepSegment): Promise<void> {
   const existing = await db
