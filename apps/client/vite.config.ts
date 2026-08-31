@@ -17,6 +17,10 @@ export default defineConfig({
       workbox: {
         // default pattern skips fonts, which would break them offline
         globPatterns: ['**/*.{js,css,html,woff2,wasm}'],
+        /* bumped once (2026-08-31): entries precached before the COOP/COEP
+           deploy lack the headers and can't serve workers in the isolated
+           context; a new cacheId refetches everything */
+        cacheId: 'sleep-bank-coi',
       },
       includeAssets: ['favicon.ico'],
       manifest: {
