@@ -1,5 +1,5 @@
 // import '@fontsource-variable/newsreader'
-import '@fontsource-variable/literata'
+import './assets/fonts.css'
 
 import './assets/theme.css'
 
