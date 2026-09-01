@@ -19,8 +19,9 @@ const BASELINE = 480
 describe('nightDebtDelta', () => {
   it.each([
     [420, 60], // an hour short
-    [480, 0], // on target
-    [510, -30], // surplus repays 1:1
+    [480, -30], // on target: 30 for showing up
+    [510, -60], // show-up plus surplus 1:1
+    [540, -90], // 60 surplus reaches the cap exactly
     [570, -90], // repayment caps at 90
     [960, -90], // rule 3: a 16-hour sleep repays the same
     [0, 480], // logged, slept nothing
@@ -52,13 +53,13 @@ describe('sleepDebt', () => {
     expect(sleepDebt(nights, BASELINE, END)).toBe(120)
   })
 
-  it('credits surplus against shortfall, capped per night', () => {
+  it('credits repayments against shortfall, capped per night', () => {
     const nights = [
       night('2026-08-27', 300), // 180 short
       night('2026-08-28', 960), // repays only 90 despite 8h over
-      night('2026-08-29', 510), // repays 30
+      night('2026-08-29', 510), // repays 60: show-up plus 30 surplus
     ]
-    expect(sleepDebt(nights, BASELINE, END)).toBe(60)
+    expect(sleepDebt(nights, BASELINE, END)).toBe(30)
   })
 
   it('floors at zero — no bank, no surplus', () => {
@@ -88,9 +89,10 @@ describe('sleepDebt', () => {
 describe('tonightTargetMinutes', () => {
   it.each([
     [0, 480], // no debt: just the baseline
-    [30, 510], // repay what's owed
-    [90, 570], // exactly the cap
-    [300, 570], // rule 3: one night repays at most 90
+    [30, 480], // showing up already repays it
+    [60, 510], // 30 surplus on top of the show-up credit
+    [90, 540], // exactly the cap: 60 surplus
+    [300, 540], // rule 3: one night repays at most 90
   ])('debt %i with 480 baseline -> %i', (debt, expected) => {
     expect(tonightTargetMinutes(480, debt)).toBe(expected)
   })

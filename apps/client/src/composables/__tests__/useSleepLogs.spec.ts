@@ -33,9 +33,9 @@ describe('useSleepLogs', () => {
     const { nights, saveNight } = useSleepLogs(2026, 7)
     await flushPromises()
     vi.mocked(getSleepLogsForMonth).mockResolvedValue([])
-    const segment = { startMinuteOfDay: 1350, endMinuteOfDay: 420 }
-    await saveNight('2026-08-13', segment)
-    expect(saveSleepLog).toHaveBeenCalledWith('2026-08-13', segment)
+    const segments = [{ startMinuteOfDay: 1350, endMinuteOfDay: 420 }]
+    await saveNight('2026-08-13', segments)
+    expect(saveSleepLog).toHaveBeenCalledWith('2026-08-13', segments)
     expect(nights.value).toEqual([])
   })
 

@@ -1,0 +1,13 @@
+{
+  "name": "@sleep-bank/seeder",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "@sleep-bank/logic": "workspace:^"
+  }
+}

@@ -2,18 +2,22 @@ import { nightSleptMinutes, type SleepLogNight } from './night'
 
 /* SLEEP.md rule 1: debt is a 14-day rolling sum */
 export const DEBT_WINDOW_NIGHTS = 14
-/* SLEEP.md rule 3: one night repays at most 90 minutes */
+/* SLEEP.md rule 3: a night at target repays 30 — sleep after debt is deeper */
+export const SHOWUP_REPAYMENT_MINUTES = 30
+/* SLEEP.md rule 3: one night repays at most 90 minutes (show-up + 60 surplus) */
 export const MAX_NIGHTLY_REPAYMENT_MINUTES = 90
 /* SLEEP.md rule 2: compute and show at 30 */
 export const DEBT_RESOLUTION_MINUTES = 30
 
 /**
- * One night's signed contribution to debt, in minutes: positive shortfall,
- * or negative credited surplus (1:1, capped — SLEEP.md rule 3).
+ * One night's signed contribution to debt, in minutes: positive shortfall, or
+ * negative repayment — 30 for making target, plus surplus 1:1, capped at 90
+ * (SLEEP.md rule 3).
  */
 export function nightDebtDelta(night: SleepLogNight, baselineMinutes: number): number {
   const delta = baselineMinutes - nightSleptMinutes(night)
-  return delta >= 0 ? delta : Math.max(delta, -MAX_NIGHTLY_REPAYMENT_MINUTES)
+  if (delta > 0) return delta
+  return Math.max(delta - SHOWUP_REPAYMENT_MINUTES, -MAX_NIGHTLY_REPAYMENT_MINUTES)
 }
 
 /** the 14 wake-up-date keys of the window ending at `endWakeUpDate`, ascending */
@@ -28,11 +32,13 @@ export function debtWindow(endWakeUpDate: string): string[] {
 }
 
 /**
- * Minutes to sleep tonight: baseline plus as much debt as one night may
- * repay (SLEEP.md rule 3).
+ * Minutes to sleep tonight to repay as much debt as one night may: making
+ * target already repays 30, so only debt beyond that needs surplus on top
+ * (SLEEP.md rule 3).
  */
 export function tonightTargetMinutes(baselineMinutes: number, debtMinutes: number): number {
-  return baselineMinutes + Math.min(debtMinutes, MAX_NIGHTLY_REPAYMENT_MINUTES)
+  const repayable = Math.min(debtMinutes, MAX_NIGHTLY_REPAYMENT_MINUTES)
+  return baselineMinutes + Math.max(0, repayable - SHOWUP_REPAYMENT_MINUTES)
 }
 
 /** minute of day to be in bed to fit `targetMinutes` before the wake-up time */

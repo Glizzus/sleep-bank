@@ -26,8 +26,8 @@ export function useSleepLogs(year: MaybeRefOrGetter<number>, month: MaybeRefOrGe
 
   /* writes repull instead of patching local state: the db is local, so a
      re-read is ~instant and stays the single source of truth */
-  async function saveNight(wakeUpDate: string, segment: SleepSegment) {
-    await saveSleepLog(wakeUpDate, segment)
+  async function saveNight(wakeUpDate: string, segments: SleepSegment[]) {
+    await saveSleepLog(wakeUpDate, segments)
     await refresh()
   }
 

@@ -70,8 +70,8 @@ export async function deleteSleepLog(wakeUpDate: string): Promise<void> {
   await db.delete(sleepLog).where(eq(sleepLog.id, logId))
 }
 
-/** upserts the night and replaces its entries with the single given segment */
-export async function saveSleepLog(wakeUpDate: string, segment: SleepSegment): Promise<void> {
+/** upserts the night and replaces its entries with the given segments */
+export async function saveSleepLog(wakeUpDate: string, segments: SleepSegment[]): Promise<void> {
   const existing = await db
     .select({ id: sleepLog.id })
     .from(sleepLog)
@@ -84,10 +84,13 @@ export async function saveSleepLog(wakeUpDate: string, segment: SleepSegment): P
   }
 
   await db.delete(sleepLogEntry).where(eq(sleepLogEntry.sleepLogId, logId))
-  await db.insert(sleepLogEntry).values({
-    id: crypto.randomUUID(),
-    sleepLogId: logId,
-    startMinuteOfDay: segment.startMinuteOfDay,
-    endMinuteOfDay: segment.endMinuteOfDay,
-  })
+  if (segments.length === 0) return
+  await db.insert(sleepLogEntry).values(
+    segments.map((segment) => ({
+      id: crypto.randomUUID(),
+      sleepLogId: logId,
+      startMinuteOfDay: segment.startMinuteOfDay,
+      endMinuteOfDay: segment.endMinuteOfDay,
+    })),
+  )
 }

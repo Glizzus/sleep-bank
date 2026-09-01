@@ -40,9 +40,9 @@ function sleptLabel(date: Date): string | undefined {
 const sheetOpen = ref(false)
 const selectedDate = ref<Date>()
 
-const initialSegment = computed(() =>
+const initialSegments = computed(() =>
   selectedDate.value
-    ? nightsByDate.value.get(wakeUpDateKey(selectedDate.value))?.entries[0]
+    ? nightsByDate.value.get(wakeUpDateKey(selectedDate.value))?.entries
     : undefined,
 )
 
@@ -51,9 +51,9 @@ function openNight(date: Date) {
   sheetOpen.value = true
 }
 
-function onSave(segment: SleepSegment) {
+function onSave(segments: SleepSegment[]) {
   if (selectedDate.value === undefined) return
-  void saveNight(wakeUpDateKey(selectedDate.value), segment)
+  void saveNight(wakeUpDateKey(selectedDate.value), segments)
 }
 
 function onClear() {
@@ -74,7 +74,7 @@ function onClear() {
   <SleepLogSheet
     v-model:open="sheetOpen"
     :date="selectedDate"
-    :initial="initialSegment"
+    :initial="initialSegments"
     @save="onSave"
     @clear="onClear"
   />

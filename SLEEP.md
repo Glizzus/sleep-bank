@@ -12,8 +12,8 @@ Shortfall over the last 14 nights, minus credited surplus, floored at zero. Olde
 **2. Resolution is 30 minutes.**
 Take input at 15. Compute and show at 30. No decimals, ever. Self-reported sleep is off by half an hour on a good night; we don't display precision we don't have.
 
-**3. One night repays at most 90 minutes.**
-Surplus above target repays 1:1, capped at 90 min/night. A 16-hour sleep and a 9.5-hour sleep repay the same. A week of debt takes about a week to clear.
+**3. One night repays 30 for showing up, plus surplus, capped at 90.**
+A night at target repays 30 min: sleep after debt is deeper. Surplus above target repays 1:1 on top, capped at 90 min/night total. A 16-hour sleep and a 9.5-hour sleep repay the same. A week of debt takes about a week to clear.
 
 **4. Debt floors at zero.**
 No bank. No surplus. No deposits.
@@ -29,7 +29,7 @@ We can't measure it. We don't pretend to.
 | Sleep quality, stages | Nothing. Seven logged hours is seven hours. |
 | Naps vs. one block | Nothing. Total per 24h is what counts. |
 | Individual vulnerability | Nothing. |
-| Recovery curve shape | Cap + 1:1. We don't draw curves we can't see. |
+| Recovery curve shape | Step + cap + 1:1. We don't draw curves we can't see. |
 | How you feel | Never asked. Feeling fine does not clear debt. |
 
 ## Forbidden

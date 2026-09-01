@@ -99,7 +99,7 @@ describe('NightsView', () => {
     const sheet = wrapper.getComponent(SleepLogSheet)
     expect(sheet.props('open')).toBe(true)
     expect(sheet.props('date')).toEqual(new Date(2026, 7, 12))
-    expect(sheet.props('initial')).toBe(loggedNight.entries[0])
+    expect(sheet.props('initial')).toBe(loggedNight.entries)
   })
 
   it('opens the sheet unprefilled for an unlogged day', async () => {
@@ -113,9 +113,12 @@ describe('NightsView', () => {
   it('saves through saveNight keyed by the selected date', async () => {
     const wrapper = shallowMount(NightsView)
     await selectDay(wrapper, new Date(2026, 7, 13))
-    const segment = { startMinuteOfDay: 1350, endMinuteOfDay: 420 }
-    wrapper.getComponent(SleepLogSheet).vm.$emit('save', segment)
-    expect(saveNight).toHaveBeenCalledWith('2026-08-13', segment)
+    const segments = [
+      { startMinuteOfDay: 1350, endMinuteOfDay: 420 },
+      { startMinuteOfDay: 780, endMinuteOfDay: 840 },
+    ]
+    wrapper.getComponent(SleepLogSheet).vm.$emit('save', segments)
+    expect(saveNight).toHaveBeenCalledWith('2026-08-13', segments)
   })
 
   it('clears through deleteNight keyed by the selected date', async () => {

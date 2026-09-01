@@ -17,4 +17,8 @@ defineProps<{ label: string }>()
   gap: 1rem;
   padding-block: 0.75rem;
 }
+
+.row > span {
+  font-size: 1.25rem;
+}
 </style>

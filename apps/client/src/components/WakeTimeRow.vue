@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { formatTimeOfDay } from '@sleep-bank/logic'
-import FifteenMinuteStepper from '@/components/FifteenMinuteStepper.vue'
+import FifteenMinuteTimeOfDayStepper from '@/components/FifteenMinuteTimeOfDayStepper.vue'
 import SettingRow from '@/components/SettingRow.vue'
 
 /** wake time, in minutes since midnight */
@@ -9,8 +8,6 @@ const value = defineModel<number>({ required: true })
 
 <template>
   <SettingRow label="Wake Time">
-    <FifteenMinuteStepper v-model="value" :max="1425" wrap>
-      <template #default="{ value: minutes }">{{ formatTimeOfDay(minutes) }}</template>
-    </FifteenMinuteStepper>
+    <FifteenMinuteTimeOfDayStepper v-model="value" />
   </SettingRow>
 </template>
